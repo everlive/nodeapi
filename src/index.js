@@ -2,7 +2,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import express from 'express';
-import uuid from 'uuid';
+import uuidv4 from 'uuid/v4';
 
 const app = express();
 
@@ -12,11 +12,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
+app.use((req, res, next) => {
+    req.me = users[1];
+    next();
+  });
 
 app.get('/', (req, res) => {
     return res.send('Received a GET HTTP method');
   });
-  
+  app.get('/session', (req, res) => {
+    return res.send(users[req.me.id]);
+  });
   app.post('/', (req, res) => {
     return res.send('Received a POST HTTP method');
   });
@@ -49,13 +55,24 @@ app.get('/', (req, res) => {
     const message = {
       id,
       text: req.body.text,
+      userId: req.me.id,
     };
   
     messages[id] = message;
   
     return res.send(message);
   });
-
+  app.delete('/messages/:messageId', (req, res) => {
+    const {
+      [req.params.messageId]: message,
+      ...otherMessages
+    } = messages;
+  
+    messages = otherMessages;
+  
+    return res.send(message);
+  });
+  
   app.post('/users', (req, res) => {
     return res.send('POST HTTP method on user resource');
   });
