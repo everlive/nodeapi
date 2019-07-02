@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import routes from './routes';
 import models from './models';
 import express from 'express';
 import uuidv4 from 'uuid/v4';
@@ -10,6 +11,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/session', routes.session);
+app.use('/users', routes.user);
+app.use('/messages', routes.message);
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
